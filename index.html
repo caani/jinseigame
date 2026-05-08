@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>超カラフル人生ゲーム</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:"Segoe UI",sans-serif;
+background:linear-gradient(135deg,#ffb8f0,#b9dcff,#c8ffcc);
+min-height:100vh;
+padding:20px;
+overflow-x:hidden;
+}
+
+#game{
+max-width:1400px;
+margin:auto;
+background:white;
+border-radius:35px;
+padding:20px;
+box-shadow:0 10px 40px rgba(0,0,0,.2);
+}
+
+/* キャラ選択 */
+
+#characterSelect{
+position:fixed;
+inset:0;
+background:linear-gradient(135deg,#ffb8f0,#b9dcff,#c8ffcc);
+z-index:9999;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+padding:30px;
+}
+
+#characterSelect h1{
+font-size:60px;
+margin-bottom:20px;
+}
+
+#characterSelect p{
+font-size:28px;
+margin-bottom:35px;
+}
+
+#characterGrid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:25px;
+}
+
+.characterCard{
+background:white;
+width:240px;
+padding:30px;
+border-radius:30px;
+text-align:center;
+cursor:pointer;
+transition:.2s;
+border:6px solid transparent;
+}
+
+.characterCard:hover{
+transform:scale(1.05);
+}
+
+.characterCard.selected{
+border-color:yellow;
+transform:scale(1.08);
+}
+
+.characterIcon{
+font-size:80px;
+margin-bottom:15px;
+}
+
+.characterName{
+font-size:35px;
+font-weight:bold;
+}
+
+.characterJob{
+font-size:20px;
+margin-top:10px;
+color:#666;
+}
+
+#startBtn{
+margin-top:40px;
+padding:25px 60px;
+font-size:35px;
+border:none;
+border-radius:999px;
+background:linear-gradient(135deg,#ff5fd2,#8f4dff);
+color:white;
+cursor:pointer;
+}
+
+/* 上 */
+
+#top{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
+}
+
+#playerArea{
+display:flex;
+align-items:center;
+gap:15px;
+}
+
+.avatar{
+width:90px;
+height:90px;
+border-radius:20px;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:50px;
+background:linear-gradient(135deg,#ffcf6d,#ff7ac6);
+color:white;
+}
+
+#playerName{
+font-size:35px;
+font-weight:bold;
+}
+
+#playerJob{
+font-size:18px;
+font-weight:bold;
+color:#666;
+}
+
+#turn{
+background:#f1e0ff;
+padding:18px 35px;
+border-radius:999px;
+font-size:28px;
+font-weight:bold;
+color:#7b2fd8;
+}
+
+/* ステータス */
+
+#stats{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:15px;
+margin-bottom:20px;
+}
+
+.stat{
+border-radius:25px;
+padding:20px;
+color:white;
+min-height:140px;
+}
+
+.stat h3{
+font-size:24px;
+margin-bottom:15px;
+}
+
+.value{
+font-size:60px;
+font-weight:bold;
+}
+
+.money{
+background:linear-gradient(135deg,#ffd84d,#ffb300);
+}
+
+.study{
+background:linear-gradient(135deg,#6db8ff,#296dff);
+}
+
+.love{
+background:linear-gradient(135deg,#ff9ad6,#ff4ca0);
+}
+
+.happy{
+background:linear-gradient(135deg,#8eff8e,#23b323);
+}
+
+/* 背景 */
+
+#scene{
+height:250px;
+border-radius:35px;
+overflow:hidden;
+position:relative;
+background:linear-gradient(#bfe3ff,#dff4ff);
+margin-bottom:25px;
+}
+
+.ground{
+position:absolute;
+bottom:0;
+width:100%;
+height:60px;
+background:#9bdd77;
+}
+
+.tree{
+position:absolute;
+bottom:60px;
+width:50px;
+height:50px;
+background:#2fa12f;
+border-radius:50%;
+}
+
+.building{
+position:absolute;
+bottom:60px;
+width:100px;
+background:#d59659;
+}
+
+.playerToken{
+position:absolute;
+bottom:20px;
+font-size:70px;
+}
+
+/* イベント */
+
+#event{
+background:linear-gradient(135deg,#fff4c9,#ffe49d);
+border:8px solid #ffbf00;
+border-radius:40px;
+padding:40px;
+margin-bottom:25px;
+min-height:350px;
+}
+
+#eventTitle{
+font-size:65px;
+font-weight:900;
+margin-bottom:20px;
+color:#9b5c00;
+}
+
+#eventText{
+font-size:35px;
+font-weight:bold;
+line-height:1.8;
+}
+
+#eventEffect{
+margin-top:30px;
+display:flex;
+gap:15px;
+flex-wrap:wrap;
+}
+
+.effect{
+background:white;
+padding:18px 30px;
+border-radius:999px;
+font-size:28px;
+font-weight:bold;
+box-shadow:0 5px 15px rgba(0,0,0,.1);
+}
+
+#choices{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:20px;
+margin-top:35px;
+}
+
+.choiceBtn{
+background:white;
+border:none;
+padding:20px;
+border-radius:25px;
+font-size:25px;
+font-weight:bold;
+cursor:pointer;
+transition:.2s;
+}
+
+.choiceBtn:hover{
+transform:scale(1.05);
+background:#fff4b0;
+}
+
+/* ボード */
+
+#board{
+display:grid;
+grid-template-columns:repeat(10,1fr);
+gap:10px;
+margin-bottom:25px;
+}
+
+.cell{
+aspect-ratio:1/1;
+border-radius:20px;
+padding:10px;
+position:relative;
+color:white;
+border:4px solid rgba(255,255,255,.5);
+transition:.2s;
+}
+
+.cell:hover{
+transform:scale(1.05);
+}
+
+.active{
+border:6px solid yellow;
+transform:scale(1.08);
+}
+
+.num{
+position:absolute;
+top:8px;
+right:10px;
+font-size:14px;
+font-weight:bold;
+}
+
+.icon{
+font-size:35px;
+}
+
+.label{
+position:absolute;
+bottom:10px;
+left:10px;
+right:10px;
+font-size:15px;
+font-weight:bold;
+}
+
+.playerIcons{
+margin-top:5px;
+display:flex;
+gap:5px;
+flex-wrap:wrap;
+}
+
+.playerBubble{
+background:white;
+color:black;
+padding:3px 8px;
+border-radius:999px;
+font-size:18px;
+font-weight:bold;
+}
+
+.c1{background:#ffb347;}
+.c2{background:#34c38f;}
+.c3{background:#4b8dff;}
+.c4{background:#ff66b2;}
+.c5{background:#9858ff;}
+.c6{background:#ff5e57;}
+
+/* 下 */
+
+#controls{
+background:#f5f3f3;
+padding:25px;
+border-radius:35px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+#dice{
+font-size:80px;
+}
+
+button{
+border:none;
+cursor:pointer;
+}
+
+#rollBtn{
+padding:22px 50px;
+border-radius:999px;
+background:linear-gradient(135deg,#ff5fd2,#8f4dff);
+color:white;
+font-size:32px;
+font-weight:bold;
+}
+
+#log{
+margin-top:20px;
+background:#fafafa;
+border-radius:20px;
+padding:20px;
+height:180px;
+overflow:auto;
+line-height:1.8;
+font-size:18px;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- キャラ選択 -->
+
+<div id="characterSelect">
+
+<h1>🎮 キャラクター選択</h1>
+
+<p>2人選んでゲームスタート！</p>
+
+<div id="characterGrid"></div>
+
+<button id="startBtn" onclick="startGame()">
+ゲームスタート
+</button>
+
+</div>
+
+<!-- ゲーム -->
+
+<div id="game">
+
+<div id="top">
+
+<div id="playerArea">
+
+<div class="avatar">
+👧
+</div>
+
+<div>
+<div id="playerName">ヒマリ</div>
+<div id="playerJob">お嬢様</div>
+</div>
+
+</div>
+
+<div id="turn">
+<span id="turnText">ヒマリのターン</span>
+</div>
+
+</div>
+
+<div id="stats">
+
+<div class="stat money">
+<h3>💰 お金</h3>
+<div class="value" id="money">5</div>
+</div>
+
+<div class="stat study">
+<h3>📚 キャリア</h3>
+<div class="value" id="study">50</div>
+</div>
+
+<div class="stat love">
+<h3>💕 恋愛</h3>
+<div class="value" id="love">0</div>
+</div>
+
+<div class="stat happy">
+<h3>😊 幸福度</h3>
+<div class="value" id="happy">50</div>
+</div>
+
+</div>
+
+<div id="scene">
+
+<div class="building" style="left:50px;height:130px;"></div>
+
+<div class="building" style="left:350px;height:90px;background:#e0bc8e;"></div>
+
+<div class="tree" style="left:220px;"></div>
+
+<div class="tree" style="left:600px;"></div>
+
+<div class="ground"></div>
+
+<div class="playerToken" style="left:500px;">
+👧
+</div>
+
+</div>
+
+<div id="event">
+
+<div id="eventTitle">
+🌟 ゲームスタート！
+</div>
+
+<div id="eventText">
+大学生活を楽しもう！
+</div>
+
+<div id="eventEffect"></div>
+
+<div id="choices"></div>
+
+</div>
+
+<div id="board"></div>
+
+<div id="controls">
+
+<div id="dice">🎲</div>
+
+<button id="rollBtn" onclick="rollDice()">
+サイコロを振る
+</button>
+
+</div>
+
+<div id="log"></div>
+
+</div>
+
+<script>
+
+/* キャラ */
+
+const characterList = [
+
+{
+name:"ヒマリ",
+icon:"👧",
+job:"お嬢様"
+},
+
+{
+name:"カイ",
+icon:"👦",
+job:"努力家"
+},
+
+{
+name:"ユナ",
+icon:"🧒",
+job:"天才肌"
+},
+
+{
+name:"ソラ",
+icon:"🧑",
+job:"陽キャ"
+},
+
+{
+name:"ミオ",
+icon:"👩",
+job:"インフルエンサー"
+},
+
+{
+name:"レン",
+icon:"👨",
+job:"ゲーマー"
+}
+
+];
+
+let players = [];
+
+let currentPlayer = 0;
+
+/* マス */
+
+const cells = [
+
+["👶","誕生","c1"],
+["🎒","小学校","c2"],
+["📚","勉強","c3"],
+["💰","お小遣い","c1"],
+["🌟","才能発見","c5"],
+["🏫","中学","c2"],
+["💌","初恋","c4"],
+["📖","受験","c3"],
+["😱","スランプ","c6"],
+["🎉","合格","c5"],
+
+["🏛️","高校","c2"],
+["💕","片思い","c4"],
+["🎓","大学受験","c3"],
+["💸","バイト","c1"],
+["💑","告白","c4"],
+["🎓","大学","c5"],
+["📊","ゼミ","c2"],
+["💘","恋人","c4"],
+["💼","就活","c1"],
+["🏅","内定","c5"],
+
+["🏢","就職","c3"],
+["📈","昇進","c2"],
+["💵","初任給","c1"],
+["💍","プロポーズ","c4"],
+["😵","残業","c6"],
+["💒","結婚","c5"],
+["👶","子供誕生","c1"],
+["🏠","マイホーム","c2"],
+["💔","夫婦喧嘩","c6"],
+["🌸","子育て","c4"],
+
+["🎒","子供入学","c2"],
+["💡","転職","c3"],
+["🎊","宝くじ","c5"],
+["🤒","病気","c6"],
+["🌳","中年期","c2"],
+["🎓","子供卒業","c3"],
+["🏆","役員","c1"],
+["✈️","旅行","c5"],
+["🌅","老後","c4"],
+["🏁","ゴール","c6"]
+
+];
+
+/* イベント */
+
+const events = [
+
+{
+title:"💕 気になる人に遭遇！",
+text:"どうする？",
+
+choices:[
+
+{
+label:"話しかける",
+love:+10,
+happy:+5
+},
+
+{
+label:"見つめるだけ",
+love:+3
+},
+
+{
+label:"友達に相談",
+happy:+5
+},
+
+{
+label:"逃げる",
+happy:-3
+}
+
+]
+
+},
+
+{
+title:"📚 テスト週間！",
+text:"どう乗り切る？",
+
+choices:[
+
+{
+label:"徹夜する",
+study:+15,
+happy:-10
+},
+
+{
+label:"計画的に勉強",
+study:+10,
+happy:+5
+},
+
+{
+label:"友達と勉強",
+study:+8,
+love:+3
+},
+
+{
+label:"諦める",
+study:-15
+}
+
+]
+
+},
+
+{
+title:"💸 バイト先で…",
+text:"店長にシフト増やせる？",
+
+choices:[
+
+{
+label:"めっちゃ働く",
+money:+15,
+happy:-8
+},
+
+{
+label:"ほどほど",
+money:+8,
+happy:+3
+},
+
+{
+label:"断る",
+happy:+5
+},
+
+{
+label:"バックれる",
+money:-5,
+happy:+10
+}
+
+]
+
+}
+
+];
+
+const board =
+document.getElementById("board");
+
+/* キャラ表示 */
+
+function renderCharacters(){
+
+const grid =
+document.getElementById("characterGrid");
+
+characterList.forEach(c=>{
+
+const div =
+document.createElement("div");
+
+div.className =
+"characterCard";
+
+div.innerHTML = `
+
+<div class="characterIcon">
+${c.icon}
+</div>
+
+<div class="characterName">
+${c.name}
+</div>
+
+<div class="characterJob">
+${c.job}
+</div>
+
+`;
+
+div.onclick = ()=>{
+
+if(div.classList.contains("selected")){
+
+div.classList.remove("selected");
+
+players =
+players.filter(
+p=>p.name !== c.name
+);
+
+return;
+}
+
+if(players.length >= 2){
+return;
+}
+
+div.classList.add("selected");
+
+players.push({
+
+...c,
+
+money:5,
+study:50,
+love:0,
+happy:50,
+position:0
+
+});
+
+};
+
+grid.appendChild(div);
+
+});
+
+}
+
+renderCharacters();
+
+/* スタート */
+
+function startGame(){
+
+if(players.length < 2){
+
+alert("2人選んで！");
+return;
+}
+
+document.getElementById(
+"characterSelect"
+).style.display = "none";
+
+updatePlayerUI(players[0]);
+
+renderBoard();
+
+}
+
+/* ボード */
+
+function renderBoard(){
+
+board.innerHTML = "";
+
+cells.forEach((cell,index)=>{
+
+const div =
+document.createElement("div");
+
+div.className =
+`cell ${cell[2]}`;
+
+players.forEach(p=>{
+
+if(p.position===index){
+div.classList.add("active");
+}
+
+});
+
+let icons = "";
+
+players.forEach(p=>{
+
+if(p.position===index){
+
+icons += `
+<div class="playerBubble">
+${p.icon}
+</div>
+`;
+
+}
+
+});
+
+div.innerHTML = `
+
+<div class="num">
+${index+1}
+</div>
+
+<div class="icon">
+${cell[0]}
+</div>
+
+<div class="label">
+${cell[1]}
+</div>
+
+<div class="playerIcons">
+${icons}
+</div>
+
+`;
+
+board.appendChild(div);
+
+});
+
+}
+
+/* UI */
+
+function updatePlayerUI(player){
+
+document.getElementById(
+"playerName"
+).textContent =
+player.name;
+
+document.getElementById(
+"playerJob"
+).textContent =
+player.job;
+
+document.getElementById(
+"money"
+).textContent =
+player.money;
+
+document.getElementById(
+"study"
+).textContent =
+player.study;
+
+document.getElementById(
+"love"
+).textContent =
+player.love;
+
+document.getElementById(
+"happy"
+).textContent =
+player.happy;
+
+document.querySelector(
+".avatar"
+).textContent =
+player.icon;
+
+}
+
+/* ログ */
+
+function addLog(text){
+
+document.getElementById(
+"log"
+).innerHTML =
+text + "<br>" +
+document.getElementById(
+"log"
+).innerHTML;
+
+}
+
+/* サイコロ */
+
+function rollDice(){
+
+const player =
+players[currentPlayer];
+
+const roll =
+Math.floor(
+Math.random()*6
+)+1;
+
+const faces =
+["⚀","⚁","⚂","⚃","⚄","⚅"];
+
+document.getElementById(
+"dice"
+).textContent =
+faces[roll-1];
+
+player.position += roll;
+
+if(player.position >= cells.length-1){
+
+player.position =
+cells.length-1;
+
+document.getElementById(
+"eventTitle"
+).textContent =
+`🏆 ${player.name} がゴール！`;
+
+document.getElementById(
+"eventText"
+).textContent =
+"人生クリア！";
+
+renderBoard();
+
+return;
+}
+
+const ev =
+events[
+Math.floor(
+Math.random()*events.length
+)
+];
+
+document.getElementById(
+"eventTitle"
+).textContent =
+ev.title;
+
+document.getElementById(
+"eventText"
+).textContent =
+`${player.name}：${ev.text}`;
+
+document.getElementById(
+"eventEffect"
+).innerHTML = "";
+
+const choicesDiv =
+document.getElementById(
+"choices"
+);
+
+choicesDiv.innerHTML = "";
+
+ev.choices.forEach(choice=>{
+
+const btn =
+document.createElement("button");
+
+btn.className =
+"choiceBtn";
+
+btn.textContent =
+choice.label;
+
+btn.onclick = ()=>{
+
+player.money +=
+choice.money || 0;
+
+player.study +=
+choice.study || 0;
+
+player.love +=
+choice.love || 0;
+
+player.happy +=
+choice.happy || 0;
+
+document.getElementById(
+"eventEffect"
+).innerHTML = `
+
+${choice.money ?
+`<div class="effect">
+💰 ${choice.money > 0 ? "+" : ""}${choice.money}
+</div>` : ""}
+
+${choice.study ?
+`<div class="effect">
+📚 ${choice.study > 0 ? "+" : ""}${choice.study}
+</div>` : ""}
+
+${choice.love ?
+`<div class="effect">
+💕 ${choice.love > 0 ? "+" : ""}${choice.love}
+</div>` : ""}
+
+${choice.happy ?
+`<div class="effect">
+😊 ${choice.happy > 0 ? "+" : ""}${choice.happy}
+</div>` : ""}
+
+`;
+
+addLog(
+`${player.name}：${ev.title}`
+);
+
+choicesDiv.innerHTML = "";
+
+renderBoard();
+
+currentPlayer++;
+
+if(currentPlayer >= players.length){
+currentPlayer = 0;
+}
+
+updatePlayerUI(
+players[currentPlayer]
+);
+
+document.getElementById(
+"turnText"
+).textContent =
+`${players[currentPlayer].name}のターン`;
+
+};
+
+choicesDiv.appendChild(btn);
+
+});
+
+renderBoard();
+
+}
+
+</script>
+
+</body>
+</html>
